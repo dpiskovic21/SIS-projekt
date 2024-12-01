@@ -2,58 +2,57 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIS_projekt;
 using SIS_projekt.Models;
 
 namespace SIS_projekt.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    public class UsersController : ControllerBase
+    public class GroupsController : ControllerBase
     {
         private readonly AppDBContext _context;
 
-        public UsersController(AppDBContext context)
+        public GroupsController(AppDBContext context)
         {
             _context = context;
         }
 
-        // GET: api/Users
+        // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Groups.ToListAsync();
         }
 
-        // GET: api/Users/5
+        // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<Group>> GetGroup(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var @group = await _context.Groups.FindAsync(id);
 
-            if (user == null)
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return @group;
         }
 
-        // PUT: api/Users/5
+        // PUT: api/Groups/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutGroup(int id, Group @group)
         {
-            if (id != user.Id)
+            if (id != @group.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(@group).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +60,7 @@ namespace SIS_projekt.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!GroupExists(id))
                 {
                     return NotFound();
                 }
@@ -74,44 +73,36 @@ namespace SIS_projekt.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
+        // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<Group>> PostGroup(Group @group)
         {
-            try
-            {
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
+            _context.Groups.Add(@group);
+            await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetUser", new { id = user.Id }, user);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
+            return CreatedAtAction(nameof(GetGroup), new { id = @group.Id }, @group);
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/Groups/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteGroup(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var @group = await _context.Groups.FindAsync(id);
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
+            _context.Groups.Remove(@group);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool UserExists(int id)
+        private bool GroupExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.Groups.Any(e => e.Id == id);
         }
     }
 }

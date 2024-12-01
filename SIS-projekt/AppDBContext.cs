@@ -14,6 +14,7 @@ namespace SIS_projekt
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Group> Groups { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -30,6 +31,11 @@ namespace SIS_projekt
                 en.Property(user => user.Email).IsRequired().HasMaxLength(100);
                 en.HasIndex(user => user.Email).IsUnique();
                 en.Property(user => user.Password).IsRequired();
+            });
+            modelBuilder.Entity<Group>(g =>
+            {
+                g.HasKey(e => e.Id);
+                g.Property(e => e.Name).IsRequired().HasMaxLength(200);
             });
         }
 
