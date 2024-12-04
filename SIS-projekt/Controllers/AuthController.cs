@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SIS_projekt.DTO;
 using SIS_projekt.Models;
-using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -47,6 +46,11 @@ namespace SIS_projekt.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> Register(RegisterUserDTO dto)
         {
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user is not null)
+            {
+                return BadRequest("Email taken");
+            }
             try
             {
                 User newUser = new()
@@ -58,7 +62,7 @@ namespace SIS_projekt.Controllers
                 await _context.Users.AddAsync(newUser);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(UsersController.GetUser), nameof(UsersController), newUser.Id, newUser);
+                return CreatedAtAction(nameof(UsersController.GetUser), "Users", new { id =  newUser.Id }, newUser);
             }
             catch (Exception ex)
             {

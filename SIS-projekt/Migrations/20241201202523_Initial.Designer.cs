@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SIS_projekt;
@@ -11,9 +12,11 @@ using SIS_projekt;
 namespace SIS_projekt.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241201202523_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,7 +113,7 @@ namespace SIS_projekt.Migrations
                     b.HasOne("SIS_projekt.Models.Channel", "Channel")
                         .WithMany("Messages")
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SIS_projekt.Models.User", "User")
@@ -127,13 +130,13 @@ namespace SIS_projekt.Migrations
             modelBuilder.Entity("SIS_projekt.Models.UserChannel", b =>
                 {
                     b.HasOne("SIS_projekt.Models.Channel", "Channel")
-                        .WithMany()
+                        .WithMany("UserChannels")
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SIS_projekt.Models.User", "User")
-                        .WithMany()
+                        .WithMany("UserChannels")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -146,11 +149,15 @@ namespace SIS_projekt.Migrations
             modelBuilder.Entity("SIS_projekt.Models.Channel", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("UserChannels");
                 });
 
             modelBuilder.Entity("SIS_projekt.Models.User", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("UserChannels");
                 });
 #pragma warning restore 612, 618
         }

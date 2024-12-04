@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIS_projekt.Models;
@@ -24,9 +25,14 @@ namespace SIS_projekt.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return Ok((await _context.Users.ToListAsync()).Select(u => new
+            {
+                u.Id,
+                u.Email,
+                u.Password
+            }));
         }
 
         // GET: api/Users/5
@@ -40,8 +46,22 @@ namespace SIS_projekt.Controllers
                 return NotFound();
             }
 
-            return user;
+            return Ok(new
+            {
+                user.Id,
+                user.Email,
+                user.Password
+            });
         }
+
+        [HttpGet("{id}/messages")]
+        public async Task<ActionResult<List<Message>>> GetUserMessages(int id)
+        {
+            var messages = await _context.Messages.Where(m => m.UserId == id).ToListAsync();
+            return messages;
+        }
+
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -72,25 +92,6 @@ namespace SIS_projekt.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            try
-            {
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction("GetUser", new { id = user.Id }, user);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
         }
 
         // DELETE: api/Users/5

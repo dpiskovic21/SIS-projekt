@@ -14,7 +14,9 @@ namespace SIS_projekt
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Group> Groups { get; set; }
+        public DbSet<Channel> Channels { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<UserChannel> UserChannels { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -25,18 +27,30 @@ namespace SIS_projekt
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<User>(en =>
-            {
-                en.HasKey(e => e.Id);
-                en.Property(user => user.Email).IsRequired().HasMaxLength(100);
-                en.HasIndex(user => user.Email).IsUnique();
-                en.Property(user => user.Password).IsRequired();
-            });
-            modelBuilder.Entity<Group>(g =>
-            {
-                g.HasKey(e => e.Id);
-                g.Property(e => e.Name).IsRequired().HasMaxLength(200);
-            });
+
+            modelBuilder.Entity<UserChannel>()
+                .HasKey(uc => new { uc.UserId, uc.ChannelId });
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Channels)
+                .WithMany(c => c.Users)
+                .UsingEntity<UserChannel>(
+                    j => j.HasOne(uc => uc.Channel).WithMany().HasForeignKey(uc => uc.ChannelId),
+                    j => j.HasOne(uc => uc.User).WithMany().HasForeignKey(uc => uc.UserId)
+                );
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.User)
+                .WithMany(u => u.Messages)
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Channel)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ChannelId)
+                .OnDelete(DeleteBehavior.SetNull);
+
         }
 
 
