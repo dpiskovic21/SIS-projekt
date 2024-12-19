@@ -1,0 +1,26 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./data:/docker-entrypoint-initdb.d
+
+  api:
+    image: sis_api
+    container_name: sis_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+      
+volumes:
+  pgdata:

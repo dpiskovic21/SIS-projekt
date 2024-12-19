@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIS-projekt", "SIS-projekt\SIS-projekt.csproj", "{767374DA-82C8-4836-8230-D99C0FE069CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{767374DA-82C8-4836-8230-D99C0FE069CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{767374DA-82C8-4836-8230-D99C0FE069CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{767374DA-82C8-4836-8230-D99C0FE069CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{767374DA-82C8-4836-8230-D99C0FE069CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D6718F3-095A-4776-8BD7-2F28FD903B27}
+	EndGlobalSection
+EndGlobal
