@@ -38,8 +38,14 @@ namespace SIS_projekt.Controllers
 
         // GET: api/Channels/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Channel>> GetChannel(int id)
         {
+            var jwtUserId = User.FindFirst("id")?.Value;
+            if (jwtUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
             var channel = await _context.Channels
                 .Include(c => c.Messages)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -47,6 +53,12 @@ namespace SIS_projekt.Controllers
             if (channel == null)
             {
                 return NotFound();
+            }
+            var isUserInChannel = await _context.UserChannels.AnyAsync(c => c.ChannelId == id && c.UserId == int.Parse(jwtUserId));
+            if (!isUserInChannel)
+            {
+                return Unauthorized("You are not in this channel.");
+                
             }
 
             return channel;

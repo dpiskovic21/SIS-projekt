@@ -41,9 +41,21 @@ namespace SIS_projekt.Controllers
 
         // POST: api/Messages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Message>> PostMessage(CreateMessageDTO dto)
         {
+            var jwtUserId = User.FindFirst("id")?.Value;
+
+            if (jwtUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (jwtUserId != dto.UserId.ToString())
+            {
+                return Unauthorized("You are not authorized to send a message for this user.");
+            }
             Message newMessage = new()
             {
                 Content = dto.Content,

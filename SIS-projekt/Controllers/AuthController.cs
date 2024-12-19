@@ -15,10 +15,12 @@ namespace SIS_projekt.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AppDBContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(AppDBContext context)
+        public AuthController(AppDBContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -33,7 +35,8 @@ namespace SIS_projekt.Controllers
                 }
 
                 string token = GenerateJwtToken(user.Id);
-                return Ok(token);
+                Response.Headers.Append("Authorization", $"Bearer {token}");
+                return Ok("Login Successful");
 
             }
             catch (Exception ex)
@@ -62,7 +65,7 @@ namespace SIS_projekt.Controllers
                 await _context.Users.AddAsync(newUser);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(UsersController.GetUser), "Users", new { id =  newUser.Id }, newUser);
+                return CreatedAtAction(nameof(UsersController.GetUser), "Users", new { id =  newUser.Id }, newUser.Email);
             }
             catch (Exception ex)
             {
@@ -72,17 +75,18 @@ namespace SIS_projekt.Controllers
 
         private string GenerateJwtToken(int id)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("S2FxZoeMrlu0GwoNoFNLsx0SwIIVDXFF"));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "your_issuer",
-                audience: "your_audience",
-                claims: new List<Claim>(id),
-                expires: DateTime.Now.AddSeconds(30),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(new []{new Claim("id", id.ToString())}),
+                Expires = DateTime.Now.AddDays(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Audience = _configuration["JWT:Audience"],
+                Issuer = _configuration["JWT:Issuer"],
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 
